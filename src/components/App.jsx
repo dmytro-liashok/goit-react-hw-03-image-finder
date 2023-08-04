@@ -25,28 +25,30 @@ export class App extends Component {
         isLoader: true,
       });
       try {
-        fetchHits(searchValue, page).then(response => {
-          const hits = response.hits;
-          if (hits.length === 0) {
-            toast.warn('Pictures not found.');
-            return;
-          }
-          this.setState({
-            hits,
-            isLoadMoreBtn: true,
+        fetchHits(searchValue, page)
+          .then(response => {
+            const hits = response.hits;
+            if (hits.length === 0) {
+              toast.warn('Pictures not found.');
+              return;
+            }
+            this.setState({
+              hits,
+              isLoadMoreBtn: true,
+            });
+          })
+          .finally(() => {
+            this.setState({
+              isLoader: false,
+            });
           });
-        });
       } catch (error) {
         toast.error('Oops! Something went wrong! Please try again!');
-      } finally {
-        this.setState({
-          isLoader: false,
-        });
       }
     }
   }
 
-  formSubmitValue = (searchValue, event) => {
+  formSubmitValue = searchValue => {
     if (!searchValue.trim()) {
       return;
     }
@@ -75,12 +77,12 @@ export class App extends Component {
       fetchHits(this.state.searchValue, nextPage).then(response => {
         const totalHits = response.totalHits;
         const hits = response.hits;
-        if (this.state.page >= Math.ceil(totalHits / 50)) {
+        if (this.state.page >= Math.ceil(totalHits / 12)) {
           toast.warn('Oops, no more pictures');
         }
         this.setState(prevState => ({
           hits: [...prevState.hits, ...hits],
-          isLoadMoreBtn: this.state.page < Math.ceil(totalHits / 50),
+          isLoadMoreBtn: this.state.page < Math.ceil(totalHits / 12),
         }));
       });
     } catch (error) {
